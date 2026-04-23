@@ -1,1 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>You Have Been Chosen</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;700&display=swap');
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; background:#000; font-family:'Cinzel', serif; }
+#vid-wrap { position:fixed; inset:0; z-index:0; }
+#bg-video { width:100%; height:100%; object-fit:cover; object-position:center center; }
+#mk-top { position:absolute; top:0; left:0; right:0; height:10%; background:linear-gradient(to bottom,#000 30%,transparent); z-index:1; }
+#mk-bottom { position:absolute; bottom:0; left:0; right:0; height:14%; background:linear-gradient(to top, #000 30%,transparent); z-index:1; }
+#mk-left { position:absolute; top:0; left:0; bottom:0; width:6%; background:linear-gradient(to right, #000 20%,transparent); z-index:1; }
+#mk-right { position:absolute; top:0; right:0; bottom:0; width:6%; background:linear-gradient(to left, #000 20%,transparent); z-index:1; }
+#grain { position:fixed; inset:0; z-index:2; pointer-events:none; opacity:.04; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E"); background-size:200px 200px; animation:gr .1s steps(1) infinite; }
+@keyframes gr { 0%{background-position:0 0} 25%{background-position:55px -30px} 50%{background-position:-22px 48px} 75%{background-position:38px 18px} }
+#vig { position:fixed; inset:0; z-index:3; pointer-events:none; background:radial-gradient(ellipse at 50% 50%,transparent 28%,rgba(0,0,0,.72) 100%); }
+#tap-gate { position:fixed; inset:0; z-index:20; display:flex; align-items:center; justify-content:center; background:#000; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+#tap-gate p { font-family:'Cinzel',serif; font-size:clamp(13px,3vw,18px); letter-spacing:.45em; color:rgba(255,255,255,.55); text-transform:uppercase; pointer-events:none; animation:tapPulse 2s ease-in-out infinite; }
+@keyframes tapPulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+#overlay { position:fixed; inset:0; z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px 20px; pointer-events:none; opacity:0; transition:opacity 1.6s ease; }
+#overlay.visible { opacity:1; pointer-events:auto; }
+#overlay.visible .ov-pre { animation:rise .9s .1s ease forwards; }
+#overlay.visible .ov-name { animation:rise 1.1s .5s ease forwards; }
+#overlay.visible .ov-divider { animation:rise .8s 1.0s ease forwards; }
+#overlay.visible .ov-copy { animation:rise .9s 1.4s ease forwards; }
+#overlay.visible .ov-position { animation:rise 1s 1.9s ease forwards; }
+#overlay.visible #accept-btn { animation:rise 1s 2.5s ease forwards; }
+#overlay.visible .btn-note { animation:rise .8s 3.0s ease forwards; }
+.ov-inner { max-width:540px; width:100%; }
+.ov-pre { font-family:'Cinzel',serif; font-size:clamp(11px,2vw,14px); letter-spacing:.6em; color:rgba(255,255,255,.75); font-weight:700; text-transform:uppercase; margin-bottom:16px; opacity:0; }
+.ov-name { font-family:'Cinzel Decorative',serif; font-size:clamp(36px,9vw,70px); font-weight:900; color:#fff; letter-spacing:.04em; line-height:1.0; display:block; opacity:0; text-shadow:0 2px 40px rgba(0,0,0,1),0 0 80px rgba(0,0,0,.8),0 0 4px rgba(0,0,0,1); }
+.ov-divider { display:flex; align-items:center; gap:16px; margin:18px auto; max-width:280px; opacity:0; }
+.ov-div-line { flex:1; height:1px; background:rgba(255,255,255,.28); }
+.ov-div-sym { font-size:11px; color:rgba(255,255,255,.38); letter-spacing:.3em; }
+.ov-copy { font-family:'Cinzel',serif; font-size:clamp(14px,2.8vw,19px); color:rgba(255,255,255,.85); letter-spacing:.1em; line-height:2.1; margin-bottom:6px; opacity:0; text-shadow:0 2px 24px rgba(0,0,0,1),0 0 50px rgba(0,0,0,.8); }
+.ov-copy em { font-style:normal; color:#fff; font-weight:700; }
+.ov-position { font-family:'Cinzel Decorative',serif; font-size:clamp(19px,4.5vw,30px); font-weight:700; color:#fff; letter-spacing:.1em; display:block; margin-top:10px; opacity:0; text-shadow:0 2px 30px rgba(0,0,0,1),0 0 60px rgba(0,0,0,.7); }
+#accept-btn { display:inline-block; margin-top:32px; padding:15px 44px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.6); color:#fff; font-family:'Cinzel',serif; font-size:clamp(12px,2.4vw,16px); letter-spacing:.5em; text-transform:uppercase; text-decoration:none; cursor:pointer; opacity:0; transition:background .3s,border-color .3s,letter-spacing .3s; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
+#accept-btn:hover { background:rgba(255,255,255,.22); border-color:#fff; letter-spacing:.6em; }
+#accept-btn:active { background:rgba(255,255,255,.3); }
+.btn-note { display:block; font-family:'Cinzel',serif; font-size:clamp(9px,1.4vw,12px); letter-spacing:.38em; color:rgba(255,255,255,.6); text-transform:uppercase; margin-top:13px; pointer-events:none; opacity:0; }
+@keyframes rise { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+<div id="tap-gate"><p>Tap to Begin</p></div>
+<div id="vid-wrap">
+  <video id="bg-video" muted playsinline preload="auto">
+    <source src="Flower.MOV" type="video/quicktime">
+  </video>
+  <audio id="bg-audio" preload="auto">
+    <source src="A Walk Along the Gates.mp3" type="audio/mpeg">
+  </audio>
+  <div id="mk-top"></div>
+  <div id="mk-bottom"></div>
+  <div id="mk-left"></div>
+  <div id="mk-right"></div>
+</div>
+<div id="grain"></div>
+<div id="vig"></div>
+<div id="overlay">
+  <div class="ov-inner">
+    <p class="ov-pre">A message from beyond</p>
+    <span class="ov-name" id="el-name"></span>
+    <div class="ov-divider">
+      <div class="ov-div-line"></div>
+      <span class="ov-div-sym">— ✦ —</span>
+      <div class="ov-div-line"></div>
+    </div>
+    <p class="ov-copy">
+      <em id="el-host"></em> is asking you<br>
+      to stand beside them<br>
+      at the most unholy day of their life —<br>
+      as their
+    </p>
+    <span class="ov-position" id="el-position"></span>
+    <a id="accept-btn" href="#">Do You Accept?</a>
+    <span class="btn-note">Tap to reply</span>
+  </div>
+</div>
+<script>
+  /* CHANGE THESE 3 FOR EACH PERSON */
+  var PERSON_NAME   = "ZACHARY HAWTHORNE";
+  var HOST_NAME     = "TYLER";
+  var POSITION_NAME = "GROOMSMAN";
 
+  var TYLER_PHONE = "17706088227";
+  var JULIE_PHONE = "16232174811";
+
+  document.getElementById('el-name').textContent     = PERSON_NAME;
+  document.getElementById('el-host').textContent     = HOST_NAME;
+  document.getElementById('el-position').textContent = POSITION_NAME;
+
+  var phone    = HOST_NAME.trim().toUpperCase() === "JULIE" ? JULIE_PHONE : TYLER_PHONE;
+  var smsBody  = encodeURIComponent(PERSON_NAME + " accepted! They are in as your " + POSITION_NAME + ".");
+  document.getElementById('accept-btn').href = 'sms:+' + phone + '&body=' + smsBody;
+
+  var vid     = document.getElementById('bg-video');
+  var bgAudio = document.getElementById('bg-audio');
+  var gate    = document.getElementById('tap-gate');
+  var overlay = document.getElementById('overlay');
+  var acceptBtn = document.getElementById('accept-btn');
+
+  function startExperience() {
+    bgAudio.currentTime = 10;
+    var vPlay = vid.play();
+    var aPlay = bgAudio.play();
+    if (vPlay) vPlay.catch(function(){});
+    if (aPlay) aPlay.catch(function(){});
+    gate.style.display = 'none';
+  }
+  gate.addEventListener('click',      startExperience, { once: true });
+  gate.addEventListener('touchstart', startExperience, { once: true, passive: true });
+
+  vid.addEventListener('ended', function() {
+    vid.currentTime = vid.duration;
+    vid.pause();
+    overlay.classList.add('visible');
+  });
+
+  /* Stop audio when accept button is tapped (href still opens SMS naturally) */
+  acceptBtn.addEventListener('click', function() {
+    bgAudio.pause();
+    bgAudio.currentTime = 0;
+  });
+  acceptBtn.addEventListener('touchstart', function() {
+    bgAudio.pause();
+    bgAudio.currentTime = 0;
+  }, { passive: true });
+</script>
+</body>
+</html>
